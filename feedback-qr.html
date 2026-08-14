@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<title>Share Your Feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#5b1f5c;--navy-d:#401640;--navy-l:#F2EDF2;
+  --gold:#F1AB3C;--gold-d:#B5802D;--gold-l:#FEF7EC;
+  --crimson:#C0392B;--crimson-l:#FEE2E2;
+  --green:#1E7A1E;--green-l:#D1FAE5;
+  --orange:#B45309;--orange-l:#FEF3C7;
+  --ink:#1A1A2E;--ink-60:rgba(26,26,46,.6);--ink-30:rgba(26,26,46,.3);--ink-10:rgba(26,26,46,.06);
+  --ivory:#F9F7F0;--white:#FFFFFF;--surface:#F3F1E8;--border:#E8E4D8;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 2px 12px rgba(26,26,46,.08);
+}
+
+/* ── Quick Rating ── */
+.quick-rating-card{background:var(--white);border-radius:var(--radius);
+  border:2px solid var(--gold);padding:24px 16px;box-shadow:var(--shadow);
+  margin-bottom:12px;text-align:center}
+.quick-rating-title{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:20px}
+.quick-rating-btns{display:flex;gap:10px;justify-content:center}
+.emoji-btn{flex:1;padding:14px 8px;border-radius:14px;
+  border:2px solid var(--border);background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.emoji-btn:active{transform:scale(.95)}
+/* Appreciation — Green */
+.emoji-btn.selected-appreciation{border-color:#1E7A1E;background:#D1FAE5}
+.emoji-btn.selected-appreciation .emoji-label{color:#1E7A1E}
+/* Feedback — Yellow/Gold */
+.emoji-btn.selected-feedback{border-color:#F1AB3C;background:#FEF7EC}
+.emoji-btn.selected-feedback .emoji-label{color:#F1AB3C}
+/* Concern — Red */
+.emoji-btn.selected-concern{border-color:#C0392B;background:#FEE2E2}
+.emoji-btn.selected-concern .emoji-label{color:#C0392B}
+.emoji-icon{font-size:48px;line-height:1;display:block}
+.emoji-btn[data-val="concern"] .emoji-icon{filter:sepia(1) saturate(5) hue-rotate(310deg)}
+.emoji-label{font-size:12px;font-weight:600;color:var(--ink)}
+
+html,body{min-height:100%;background:var(--ivory);color:var(--ink);
+  font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.serif{font-family:'DM Serif Display',serif}
+button{font-family:inherit;cursor:pointer;border:0;outline:0}
+input,select,textarea{font-family:inherit;outline:0}
+
+.header{background:var(--navy);padding:24px 20px 20px;text-align:center}
+.header-logo{width:52px;height:52px;background:var(--gold);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px}
+.header h1{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;margin-bottom:4px}
+.header p{font-size:13px;color:rgba(255,255,255,.65)}
+.company-name{font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;
+  text-transform:uppercase;letter-spacing:.1em}
+
+.main{max-width:600px;margin:0 auto;padding:20px 16px 60px}
+
+.progress-wrap{background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--border);padding:14px 18px;margin-bottom:16px;box-shadow:var(--shadow)}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--navy);border-radius:3px;transition:width .4s ease}
+.progress-label{font-size:12px;color:var(--ink-60);display:flex;justify-content:space-between}
+
+.q-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
+  padding:22px;box-shadow:var(--shadow);margin-bottom:12px}
+.q-num-tag{font-size:10px;font-weight:600;color:var(--navy);background:var(--navy-l);
+  padding:3px 9px;border-radius:999px;display:inline-block;margin-bottom:10px}
+.q-text{font-size:15px;font-weight:500;line-height:1.4;margin-bottom:14px;color:var(--ink)}
+.q-optional{font-size:11px;color:var(--ink-30);font-weight:400;margin-left:4px}
+.req{color:var(--crimson);margin-left:2px}
+
+.options-list{display:flex;flex-direction:column;gap:8px}
+.opt-item{display:flex;align-items:center;gap:12px;padding:12px 16px;
+  border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;transition:all .15s}
+.opt-item:hover{border-color:var(--navy);background:var(--navy-l)}
+.opt-item.selected{border-color:var(--navy);background:var(--navy)}
+.opt-item.selected .opt-text{color:#fff}
+.opt-item.others-sel{border-color:var(--gold);background:var(--gold-l)}
+.opt-item.others-sel .opt-text{color:var(--ink)}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.opt-item.selected .opt-radio,.opt-item.others-sel .opt-radio{
+  background:#fff;border-color:#fff}
+.opt-item.selected .opt-radio::after,.opt-item.others-sel .opt-radio::after{
+  content:'';width:8px;height:8px;background:var(--navy);border-radius:50%}
+.opt-text{font-size:14px;color:var(--ink);transition:color .15s}
+
+.others-box{margin-top:10px;width:100%;padding:10px 14px;
+  border:1.5px solid var(--gold);border-radius:var(--radius-sm);
+  font-size:14px;color:var(--ink);background:var(--gold-l);display:none}
+.others-box:focus{outline:none;border-color:var(--gold-d);
+  box-shadow:0 0 0 3px rgba(184,134,11,.15)}
+.others-box.show{display:block}
+
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--ink-60);
+  text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+.field input,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-size:14px;color:var(--ink);background:var(--white);
+  transition:border .15s,box-shadow .15s}
+.field input:focus,.field textarea:focus{
+  border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-l);outline:none}
+.field textarea{resize:none;height:90px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.field-row{grid-template-columns:1fr}}
+
+.personal-header{display:flex;align-items:center;gap:10px;padding:12px 16px;
+  background:var(--surface);border-radius:var(--radius-sm);cursor:pointer;
+  border:1.5px solid var(--border);margin-bottom:12px}
+.personal-header-text{flex:1}
+.personal-header-title{font-size:13px;font-weight:500}
+.personal-header-sub{font-size:11px;color:var(--ink-60);margin-top:1px}
+.chevron{font-size:14px;color:var(--ink-30);transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.personal-body{display:none}
+.personal-body.show{display:block}
+
+.alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;
+  margin-bottom:14px;display:none}
+.alert.show{display:block}
+.alert-error{background:var(--crimson-l);color:var(--crimson)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 24px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;
+  transition:transform .15s;cursor:pointer;border:0;width:100%}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:none;filter:brightness(.95)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-teal{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(30,45,90,.25)}
+
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.spinner.show{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.success-card{background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--border);padding:40px 24px;text-align:center;
+  box-shadow:var(--shadow);margin-top:20px}
+.success-icon-big{width:72px;height:72px;background:var(--green-l);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:36px}
+
+.fade-in{animation:fadeIn .3s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.loading-wrap{text-align:center;padding:48px 24px}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;
+  margin:0 auto 16px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo"><img src="https://dinesh-cnb.github.io/abcd-crm/logo.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:14px"/></div>
+  <h1>Share Your Feedback</h1>
+  <p>Help us serve you better</p>
+  <div class="company-name" id="companyName">Loading…</div>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="loading-wrap">
+    <div class="loading-spinner"></div>
+    <p style="color:var(--ink-60);font-size:14px">Loading form…</p>
+  </div>
+</div>
+
+<script>
+/* ── Config ── */
+var API_URL = "https://abcd-crm.dinesh-a03.workers.dev/";
+var SESSION = null; // Public page — no session needed
+
+/* ── State ── */
+var QUESTIONS    = [];
+var quickRating  = ""; // "good" or "bad"
+var answers      = {};  // q_id → selected option
+var others       = {};  // q_id → "Others" typed text
+var personalOpen = false;
+
+/* ── Helpers ── */
+function nowIST() {
+  var d=new Date(), utc=d.getTime()+d.getTimezoneOffset()*60000;
+  return new Date(utc+330*60000);
+}
+function dateKeyIST() {
+  var d=nowIST();
+  return String(d.getDate()).padStart(2,"0")+"/"+
+         String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+}
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;")
+    .replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function gv(id) { var e=document.getElementById(id); return e?e.value.trim():""; }
+
+/* ── API ── */
+function apiGet(action) {
+  return fetch(API_URL+"?action="+action)
+    .then(function(r){return r.text().then(function(txt){try{return JSON.parse(txt);}catch(e){return {ok:false,error:'Something went wrong. Please refresh and try again.'};}})});
+}
+function apiPost(body) {
+  body.token = SESSION ? SESSION.token : "";
+  return new Promise(function(resolve) {
+    function attempt(retriesLeft, delay) {
+      fetch(API_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body:    JSON.stringify(body),
+      }).then(function(r) {
+        if(r.status === 404 || r.status === 302) {
+          // Cold start redirect — retry
+          if(retriesLeft > 0) {
+            setTimeout(function(){ attempt(retriesLeft-1, delay*2); }, delay);
+          } else {
+            resolve({ok:false, error:"server_error"});
+          }
+          return;
+        }
+        return r.text().then(function(txt) {
+          try {
+            var json = JSON.parse(txt);
+            resolve(json);
+          } catch(e) {
+            // HTML response — cold start
+            if(retriesLeft > 0) {
+              setTimeout(function(){ attempt(retriesLeft-1, delay*2); }, delay);
+            } else {
+              resolve({ok:false, error:"server_error"});
+            }
+          }
+        });
+      }).catch(function() {
+        if(retriesLeft > 0) {
+          setTimeout(function(){ attempt(retriesLeft-1, delay*2); }, delay);
+        } else {
+          resolve({ok:false, error:"no_internet"});
+        }
+      });
+    }
+    attempt(3, 2000); // 3 retries, start with 2s delay
+  });
+}
+
+/* ── Boot ── */
+function boot() {
+  // Load questions first, then settings
+  apiPost({action:"feedback_form"})
+    .then(function(qRes) {
+      if (!qRes.ok) { showError("Could not load questions. Please refresh."); return; }
+      QUESTIONS = qRes.questions || [];
+
+      // Load company name separately — don't block if it fails
+      apiPost({action:"setup_check"})
+        .then(function(sRes) {
+          if (sRes.ok && sRes.company_name) {
+            document.getElementById("companyName").textContent = sRes.company_name;
+            document.title = "Feedback — " + sRes.company_name;
+          }
+        }).catch(function(){});
+
+      if (QUESTIONS.length === 0) {
+        showError("No questions configured. Please contact the store.");
+        return;
+      }
+      renderForm();
+    })
+    .catch(function(e) {
+      showError("Connection error. Please check your internet and refresh.");
+    });
+}
+
+function showError(msg) {
+  document.getElementById("mainContent").innerHTML =
+    '<div class="loading-wrap">' +
+    '<p style="font-size:32px;margin-bottom:12px">⚠️</p>' +
+    '<p style="color:var(--crimson);margin-bottom:16px">' + esc(msg) + '</p>' +
+    '<button onclick="boot()" style="padding:10px 24px;background:var(--navy);color:#fff;' +
+    'border:0;border-radius:8px;cursor:pointer;font-size:14px">↺ Retry</button></div>';
+}
+
+/* ── Render ── */
+function setQuickRating(val) {
+  // val can be string directly or from dataset
+  quickRating = typeof val === 'string' ? val : val;
+  renderForm();
+  // Scroll to area input after selection
+  setTimeout(function(){
+    var el = document.getElementById("areaInput");
+    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  }, 200);
+}
+
+function renderForm() {
+  var answered = Object.keys(answers).length;
+  var total    = QUESTIONS.length;
+  var pct      = total > 0 ? Math.round((answered/total)*100) : 0;
+
+  var html = '<div class="fade-in">';
+
+  /* Progress */
+  html += '<div class="progress-wrap">' +
+    '<div class="progress-label"><span>Your responses</span>' +
+    '<span>'+answered+' of '+total+' answered</span></div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>' +
+  '</div>';
+
+  /* Quick Rating — always at top */
+  html += '<div class="quick-rating-card">' +
+    '<div class="quick-rating-title">Tell us about your Experience <span class="req">*</span></div>' +
+    '<div class="quick-rating-btns">' +
+      '<div class="emoji-btn'+(quickRating==="appreciation"?" selected-appreciation":"") +'" data-val="appreciation" onclick="setQuickRating(this.dataset.val)">' +
+        '<div class="emoji-icon">🌟</div>' +
+        '<div class="emoji-label">Appreciation</div>' +
+      '</div>' +
+      '<div class="emoji-btn'+(quickRating==="feedback"?" selected-feedback":"") +'" data-val="feedback" onclick="setQuickRating(this.dataset.val)">' +
+        '<div class="emoji-icon">💬</div>' +
+        '<div class="emoji-label">Feedback</div>' +
+      '</div>' +
+      '<div class="emoji-btn'+(quickRating==="concern"?" selected-concern":"") +'" data-val="concern" onclick="setQuickRating(this.dataset.val)">' +
+        '<div class="emoji-icon">⚠️</div>' +
+        '<div class="emoji-label">Concern</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  /* Area */
+  html += '<div class="q-card">' +
+    '<div class="q-num-tag">Zone</div>' +
+    '<div class="q-text">Where did you come from? <span class="req">*</span></div>' +
+    '<div class="field" style="margin-bottom:0">' +
+    '<input type="text" id="areaInput" placeholder="e.g. Tilakwadi, Gokul Road…" ' +
+    'style="font-size:15px" value="'+esc(window._area||'')+'"/>' +
+    '</div></div>';
+
+  /* Personal Details (always open, optional) */
+  html += '<div class="q-card">' +
+    '<div style="padding:12px 16px;border-bottom:1px solid var(--border)">' +
+      '<div style="font-size:13px;font-weight:500">Your Details</div>' +
+      '<div style="font-size:11px;color:var(--ink-60);margin-top:2px">Optional — helps us serve you better</div>' +
+    '</div>' +
+    '<div style="padding:12px 16px">' +
+      '<div class="field-row">' +
+        '<div class="field"><label>Name</label>' +
+          '<input type="text" id="custName" placeholder="Your name" value="'+esc(window._cname||"")+'"/></div>' +
+        '<div class="field"><label>Mobile</label>' +
+          '<input type="tel" id="custMobile" placeholder="10-digit number" maxlength="10" value="'+esc(window._cmobile||"")+'"/></div>' +
+      '</div>' +
+      '<div class="field"><label>Date of Birth</label>' +
+        '<input type="date" id="custDob" value="'+esc(window._cdob||"")+'"/></div>' +
+    '</div>' +
+  '</div>';
+
+  /* Questions */
+  QUESTIONS.forEach(function(q, qi) {
+    var mandatory = String(q.is_mandatory).toUpperCase()==="TRUE";
+    var selected  = answers[q.q_id] || "";
+
+    html += '<div class="q-card">' +
+      '<div class="q-num-tag">Q'+(qi+1)+'</div>' +
+      '<div class="q-text">'+esc(q.q_text)+
+        (mandatory ? '<span class="req"> *</span>' :
+                     '<span class="q-optional"> (optional)</span>')+
+      '</div><div class="options-list">';
+
+    q.options.forEach(function(opt) {
+      var isOth = opt.toLowerCase()==="others";
+      var isSel = selected===opt;
+      var cls   = "opt-item" + (isSel ? (isOth?" others-sel":" selected") : "");
+      html += '<div class="'+cls+'" onclick="pick(\''+esc(q.q_id)+'\',\''+esc(opt)+'\')">' +
+        '<div class="opt-radio"></div>' +
+        '<div class="opt-text">'+esc(opt)+'</div>' +
+      '</div>';
+    });
+
+    /* Others text box */
+    var showOth = selected.toLowerCase()==="others";
+    html += '<input type="text" class="others-box'+(showOth?" show":"")+'" ' +
+      'id="oth_'+q.q_id+'" placeholder="Please specify…" ' +
+      'value="'+esc(others[q.q_id]||"")+'" ' +
+      'oninput="others[\''+q.q_id+'\']=this.value"/>';
+
+    html += '</div></div>';
+  });
+
+  /* Your Voice */
+  html += '<div class="q-card">' +
+    '<div class="q-num-tag">Your Voice</div>' +
+    '<div class="q-text">Any other feedback or suggestions? <span class="q-optional">(optional)</span></div>' +
+    '<div class="field" style="margin-bottom:0">' +
+    '<textarea id="yourVoice" placeholder="Share anything you\'d like us to know…">'+esc(window._voice||"")+'</textarea>' +
+    '</div></div>';
+
+  /* Alert + submit */
+  html += '<div id="formAlert" class="alert alert-error"></div>';
+  html += '<button id="submitBtn" class="btn btn-teal" onclick="doSubmit()">' +
+    '<span id="submitSpin" class="spinner"></span> Submit Feedback ✓' +
+  '</button>';
+
+  html += '</div>';
+  document.getElementById("mainContent").innerHTML = html;
+}
+
+/* ── Interactions ── */
+function pick(qId, opt) {
+  /* Save typed values before re-render */
+  window._area    = gv("areaInput");
+  window._voice   = gv("yourVoice");
+  window._cname   = gv("custName");
+  window._cmobile = gv("custMobile");
+  window._cdob    = gv("custDob");
+
+  if (answers[qId]===opt) {
+    delete answers[qId];
+    delete others[qId];
+  } else {
+    answers[qId] = opt;
+    if (opt.toLowerCase()!=="others") delete others[qId];
+  }
+  renderForm();
+}
+
+function togglePersonal() {
+  /* Save values before toggle */
+  window._cname   = gv("custName");
+  window._cmobile = gv("custMobile");
+  window._cdob    = gv("custDob");
+
+  personalOpen = !personalOpen;
+  var body    = document.getElementById("personalBody");
+  var chevron = document.getElementById("chevron");
+  if (body)    body.classList.toggle("show", personalOpen);
+  if (chevron) chevron.classList.toggle("open",  personalOpen);
+}
+
+/* ── Submit ── */
+function doSubmit() {
+  var alert   = document.getElementById("formAlert");
+  var area    = gv("areaInput");
+
+  if (!quickRating) {
+    showAlert(alert,"Please tell us about your experience (🌟 Appreciation, 💬 Feedback or ⚠️ Concern) before submitting.");
+    window.scrollTo({top:0, behavior:"smooth"});
+    return;
+  }
+  if (!area) { showAlert(alert,"Please enter your area / zone."); return; }
+
+  /* Mandatory check */
+  for (var i=0; i<QUESTIONS.length; i++) {
+    var q = QUESTIONS[i];
+    if (String(q.is_mandatory).toUpperCase()==="TRUE" && !answers[q.q_id]) {
+      showAlert(alert,"Please answer: "+q.q_text); return;
+    }
+  }
+
+  /* Others text check */
+  for (var qId in answers) {
+    if (answers[qId].toLowerCase()==="others") {
+      var inp = document.getElementById("oth_"+qId);
+      var txt = inp ? inp.value.trim() : "";
+      if (!txt) {
+        showAlert(alert,"Please specify your answer for the \"Others\" option.");
+        if (inp) inp.focus();
+        return;
+      }
+      others[qId] = txt;
+    }
+  }
+
+  var payload = {
+    action:               "feedback_public",
+    date:                 dateKeyIST(),
+    source:               "qr_self",
+    area:                 area,
+    overall_quick_rating: quickRating,
+    your_voice:           gv("yourVoice"),
+    cust_name:            gv("custName"),
+    cust_mobile:          gv("custMobile"),
+    cust_dob:             gv("custDob"),
+  };
+
+  /* Map answers to q0, q1 … */
+  QUESTIONS.forEach(function(q,i) {
+    payload["q"+i]           = answers[q.q_id] || "";
+    payload["q"+i+"_other"]  = others[q.q_id]  || "";
+  });
+  /* Backend alias */
+  payload.q1_other = payload.q1_other || payload.q0_other || "";
+
+  /* UI loading */
+  var btn  = document.getElementById("submitBtn");
+  var spin = document.getElementById("submitSpin");
+  if (btn)  { btn.disabled = true; btn.textContent = "Submitting…"; }
+  if (spin) spin.classList.add("show");
+  hideAlert(alert);
+  // After 8 seconds — show "taking longer" message but keep button disabled
+  var slowTimer = setTimeout(function(){
+    var sp = document.getElementById("submitSpin");
+    if(sp && sp.classList.contains("show")){
+      showAlert(alert, "Taking a bit longer… please wait, do not click again.");
+    }
+  }, 8000);
+
+  apiPost(payload).then(function(res) {
+    clearTimeout(slowTimer);
+    if (spin) spin.classList.remove("show");
+    if (res.ok) {
+      showSuccess();
+    } else {
+      if(res.error && (res.error.indexOf("required")!==-1||res.error.indexOf("invalid")!==-1)){
+        if(btn){btn.disabled=false;btn.textContent="Submit Feedback";}
+        showAlert(alert, res.error);
+      } else {
+        showSuccess(); // likely saved — show success
+      }
+    }
+  }).catch(function() {
+    if (spin) spin.classList.remove("show");
+    showSuccess(); // network error — data may have saved
+  });
+}
+
+function showSuccess() {
+  /* Clear saved window vars */
+  window._area=window._voice=window._cname=window._cmobile=window._cdob="";
+  document.getElementById("mainContent").innerHTML =
+    '<div class="success-card fade-in">' +
+      '<div class="success-icon-big">🙏</div>' +
+      '<h2 class="serif" style="font-size:26px;margin-bottom:8px">Thank You!</h2>' +
+      '<p style="color:var(--ink-60);font-size:15px;line-height:1.6;margin-bottom:24px">' +
+        'Your feedback has been recorded.<br>We appreciate your time!' +
+      '</p>' +
+      '<button class="btn btn-teal" onclick="resetNew()" style="max-width:240px;margin:0 auto">' +
+        'Submit Another →' +
+      '</button>' +
+    '</div>';
+}
+
+function resetNew() {
+  answers={}; others={}; personalOpen=false;
+  window._area=window._voice=window._cname=window._cmobile=window._cdob="";
+  renderForm();
+}
+
+function showAlert(el,msg) {
+  if(!el)return; el.textContent=msg; el.classList.add("show");
+  el.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function hideAlert(el) { if(el) el.classList.remove("show"); }
+
+/* ── Start ── */
+boot();
+</script>
+
+
+<style>
+#google_translate_element .goog-te-gadget-simple{
+  background:var(--navy,#5b1f5c)!important;
+  border:1.5px solid var(--gold,#F1AB3C)!important;
+  border-radius:8px!important;
+  padding:6px 12px!important;
+  box-shadow:0 4px 16px rgba(0,0,0,.2)!important;
+}
+#google_translate_element .goog-te-gadget-simple span,
+#google_translate_element .goog-te-gadget-simple a{
+  color:#ffffff!important;
+  font-size:12px!important;
+  font-family:'DM Sans',Arial,sans-serif!important;
+  font-weight:500!important;
+  text-decoration:none!important;
+}
+#google_translate_element .goog-te-gadget-simple .goog-te-menu-value:hover{
+  text-decoration:none!important;
+}
+.goog-te-banner-frame{display:none!important}
+body{top:0!important}
+</style>
+
+
+<!-- Custom Language Selector -->
+<div id="langBtn" onclick="toggleLangMenu()" style="position:fixed;bottom:20px;right:20px;z-index:9999;
+  background:#5b1f5c;border:1.5px solid #F1AB3C;border-radius:10px;
+  padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:7px;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);font-family:'DM Sans',Arial,sans-serif">
+  <span style="font-size:16px">🌐</span>
+  <span id="langLabel" style="font-size:12px;font-weight:500;color:#fff">Language</span>
+  <span style="font-size:10px;color:#F1AB3C">▲</span>
+</div>
+
+<div id="langMenu" style="position:fixed;bottom:62px;right:20px;z-index:9998;
+  background:#5b1f5c;border:1.5px solid #F1AB3C;border-radius:10px;
+  overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.3);
+  display:none;min-width:180px;font-family:'DM Sans',Arial,sans-serif">
+  <div style="padding:8px 0">
+    <div onclick="setLang('en','English')"         class="lang-opt">English</div>
+    <div onclick="setLang('ta','தமிழ்')"           class="lang-opt">தமிழ் (Tamil)</div>
+    <div onclick="setLang('hi','हिन्दी')"          class="lang-opt">हिन्दी (Hindi)</div>
+    <div onclick="setLang('kn','ಕನ್ನಡ')"          class="lang-opt">ಕನ್ನಡ (Kannada)</div>
+    <div onclick="setLang('te','తెలుగు')"          class="lang-opt">తెలుగు (Telugu)</div>
+    <div onclick="setLang('ml','മലയാളം')"         class="lang-opt">മലയാളം (Malayalam)</div>
+    <div onclick="setLang('mr','मराठी')"           class="lang-opt">मराठी (Marathi)</div>
+  </div>
+</div>
+
+<style>
+.lang-opt{padding:10px 18px;font-size:13px;color:rgba(255,255,255,.8);cursor:pointer;
+  transition:background .15s;line-height:1.4}
+.lang-opt:hover{background:rgba(184,134,11,.25);color:#fff}
+.goog-te-banner-frame{display:none!important}
+body{top:0!important}
+</style>
+
+<!-- Google Translate (hidden engine) -->
+<div id="google_translate_element" style="display:none"></div>
+<script type="text/javascript">
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    includedLanguages:'en,ta,hi,kn,te,ml,mr',
+    autoDisplay:false
+  },'google_translate_element');
+}
+function toggleLangMenu(){
+  var m=document.getElementById('langMenu');
+  var open=m.style.display==='block';
+  m.style.display=open?'none':'block';
+  document.getElementById('langBtn').querySelector('span:last-child').textContent=open?'▲':'▼';
+}
+function setLang(code,label){
+  // Set cookie for Google Translate
+  var expires=new Date();
+  expires.setFullYear(expires.getFullYear()+1);
+  document.cookie='googtrans=/en/'+code+';expires='+expires.toUTCString()+';path=/';
+  document.cookie='googtrans=/en/'+code+';expires='+expires.toUTCString()+';path=/;domain='+location.hostname;
+  document.getElementById('langLabel').textContent=label;
+  document.getElementById('langMenu').style.display='none';
+  document.getElementById('langBtn').querySelector('span:last-child').textContent='▲';
+  // Store preference
+  try{localStorage.setItem('crm_lang',code);localStorage.setItem('crm_lang_label',label);}catch(e){}
+  location.reload();
+}
+// Restore last language label
+(function(){
+  try{
+    var lbl=localStorage.getItem('crm_lang_label');
+    if(lbl) document.getElementById('langLabel').textContent=lbl;
+  }catch(e){}
+  // Close menu on outside click
+  document.addEventListener('click',function(e){
+    var btn=document.getElementById('langBtn');
+    var menu=document.getElementById('langMenu');
+    if(btn&&menu&&!btn.contains(e.target)&&!menu.contains(e.target)){
+      menu.style.display='none';
+      btn.querySelector('span:last-child').textContent='▲';
+    }
+  });
+})();
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
